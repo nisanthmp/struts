@@ -17,16 +17,28 @@
 */
 package org.superbiz.struts;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.transaction.Transactional;
 import java.util.Properties;
 
+@Component
 public class AddUser {
 
     private int id;
     private String firstName;
     private String lastName;
     private String errorMessage;
+
+    @Autowired
+    private final UserService userService;
+
+    public AddUser(UserService userService) {
+        this.userService = userService;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -60,16 +72,18 @@ public class AddUser {
         this.id = id;
     }
 
+
+    @Transactional
     public String execute() {
 
         try {
-            UserService service = null;
-            Properties props = new Properties();
+
+          /*  Properties props = new Properties();
             props.put(Context.INITIAL_CONTEXT_FACTORY,
                 "org.apache.openejb.core.LocalInitialContextFactory");
-            Context ctx = new InitialContext(props);
-            service = (UserService) ctx.lookup("UserServiceImplLocal");
-            service.add(new User(id, firstName, lastName));
+             Context ctx = new InitialContext(props);
+           userService = (UserService) ctx.lookup("UserServiceImplLocal");*/
+            userService.add(new User(id, firstName, lastName));
         } catch (Exception e) {
             this.errorMessage = e.getMessage();
             return "failure";
